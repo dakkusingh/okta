@@ -3,7 +3,7 @@ The Okta Integration Module provides Okta functionality as Drupal addon module t
 
 Following helper modules are available:
 ## Okta Batch Import
-Batch import users into Okta application from CSV or comma seperated list. 
+Allows batch import of users from Drupal admin area into Okta application from CSV or comma separated list. 
 
 ## Okta Dashboard
 Dashboard view of your account account. Prevents giving direct Okta Access to multiple users. Allows granular control of Okta views directly from Drupal.
