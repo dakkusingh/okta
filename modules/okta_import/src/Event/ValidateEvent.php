@@ -13,45 +13,33 @@ class ValidateEvent extends Event {
 
   const OKTA_IMPORT_VALIDATE = 'okta_import.validate';
 
-  protected $indexConfig;
-  protected $indexName;
+  protected $emails;
 
   /**
-   * PrepareIndexEvent constructor.
+   * ValidateEvent constructor.
    *
-   * @param $indexConfig
-   * @param $indexName
+   * @param $email
    */
-  public function __construct($indexConfig, $indexName) {
-    $this->indexConfig = $indexConfig;
-    $this->indexName = $indexName;
+  public function __construct($emails) {
+    $this->emails = $emails;
   }
 
   /**
-   * Getter for the index config array.
+   * Getter for the emails array.
    *
-   * @return indexConfig
+   * @return emails
    */
-  public function getIndexConfig() {
-    return $this->indexConfig;
+  public function getEmails() {
+    return $this->emails;
   }
 
   /**
-   * Setter for the index config array.
+   * Setter for emails array.
    *
-   * @param $indexConfig
+   * @param $emails
    */
-  public function setIndexConfig($indexConfig) {
-    $this->indexConfig = $indexConfig;
-  }
-
-  /**
-   * Getter for the index name.
-   *
-   * @return indexName
-   */
-  public function getIndexName() {
-    return $this->indexName;
+  public function setEmails($emails) {
+    $this->emails = $emails;
   }
 
 }
