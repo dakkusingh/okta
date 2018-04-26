@@ -6,3 +6,4 @@ configure: okta_import.settings
 
 dependencies:
   - okta_api:okta_api
+  - okta:okta
