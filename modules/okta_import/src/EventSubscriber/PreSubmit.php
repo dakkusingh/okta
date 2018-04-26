@@ -14,7 +14,7 @@ class PreSubmit implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events[PreSubmitEvent::OKTA_IMPORT_PRESUBMIT] = 'preSubmit';
+    $events[PreSubmitEvent::OKTA_IMPORT_PRESUBMIT] = 'preSubmitSub';
     return $events;
   }
 
@@ -22,12 +22,12 @@ class PreSubmit implements EventSubscriberInterface {
    * Alter user before pre submit.
    *
    * @param \Drupal\okta_import\Event\PreSubmitEvent $event
-   * Pre Submit Event.
+   *   Pre Submit Event.
    */
-  public function preSubmit(PreSubmitEvent $event) {
+  public function preSubmitSub(PreSubmitEvent $event) {
     $user = $event->getUser();
-    $user['profile']['firstName'] = 'Stuart';
-//    ksm($user);
+    // $user['profile']['firstName'] = 'foo';
+    // ksm($user);
     $event->setUser($user);
   }
 

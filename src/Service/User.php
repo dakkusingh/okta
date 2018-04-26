@@ -93,9 +93,11 @@ class User {
    *   Returns TRUE if the password is valid, FALSE if not.
    */
   public function checkPasswordIsValid($password, $email) {
-    // OKTA Default password policy requires passwords to meet a certain criteria.
+    // OKTA Default password policy requires
+    // passwords to meet a certain criteria.
     // See: https://developer.okta.com/docs/api/resources/policy.html#PasswordComplexityObject
-    // This custom implementation should be replaced by password_policy module once the issue below is resolved
+    // This custom implementation should be replaced by password_policy
+    // module once the issue below is resolved
     // https://www.drupal.org/project/password_policy/issues/2924009
     // https://www.drupal.org/project/password_policy/issues/2562481
     // See:

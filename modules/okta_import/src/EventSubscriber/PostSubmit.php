@@ -14,7 +14,7 @@ class PostSubmit implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events[PostSubmitEvent::OKTA_IMPORT_POSTSUBMIT] = 'postSubmit';
+    $events[PostSubmitEvent::OKTA_IMPORT_POSTSUBMIT] = 'postSubmitSub';
     return $events;
   }
 
@@ -22,12 +22,12 @@ class PostSubmit implements EventSubscriberInterface {
    * Alter user before post submit.
    *
    * @param \Drupal\okta_import\Event\PostSubmitEvent $event
-   * Post Submit Event.
+   *   Post Submit Event.
    */
-  public function postSubmit(PostSubmitEvent $event) {
+  public function postSubmitSub(PostSubmitEvent $event) {
     $user = $event->getUser();
-    ksm($user);
-    //$event->setUser($user);
+    // ksm($user);
+    // $event->setUser($user);
   }
 
 }

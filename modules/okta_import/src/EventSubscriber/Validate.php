@@ -14,7 +14,7 @@ class Validate implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events[ValidateEvent::OKTA_IMPORT_VALIDATE] = 'validate';
+    $events[ValidateEvent::OKTA_IMPORT_VALIDATE] = 'validateSub';
     return $events;
   }
 
@@ -22,9 +22,9 @@ class Validate implements EventSubscriberInterface {
    * Alter user before validate.
    *
    * @param \Drupal\okta_import\Event\ValidateEvent $event
-   * Validate Event.
+   *   Validate Event.
    */
-  public function validate(ValidateEvent $event) {
+  public function validateSub(ValidateEvent $event) {
     $emails = $event->getEmails();
     ksm($emails);
   }

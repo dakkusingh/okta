@@ -21,6 +21,8 @@ use Drupal\okta\Service\User as OktaUser;
 class Import extends FormBase {
 
   /**
+   * Logger.
+   *
    * @var \Psr\Log\LoggerInterface
    */
   protected $logger;
@@ -175,17 +177,14 @@ class Import extends FormBase {
 
     foreach ($emails as $email) {
       $user = $this->oktaUser->prepareUser($email, $password, $question, $answer);
-//      ksm($user);
-
+      // ksm($user);
       // Allow other modules to subscribe to PreSubmit Event.
       $preSubmitEvent = new PreSubmitEvent($user);
       $preEvent = $this->eventDispatcher->dispatch(PreSubmitEvent::OKTA_IMPORT_PRESUBMIT, $preSubmitEvent);
       $user = $preEvent->getUser();
-//      ksm($user);
-
+      // ksm($user);
       // TODO Create Okta Users.
-      // GO GO GO
-
+      // GO GO GO.
       // Allow other modules to subscribe to Post Submit Event.
       $postSubmitEvent = new PostSubmitEvent($user);
       $postEvent = $this->eventDispatcher->dispatch(PostSubmitEvent::OKTA_IMPORT_POSTSUBMIT, $postSubmitEvent);
@@ -193,7 +192,6 @@ class Import extends FormBase {
     }
 
     // TODO.
-
   }
 
 }

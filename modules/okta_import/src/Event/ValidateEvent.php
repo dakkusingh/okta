@@ -18,9 +18,10 @@ class ValidateEvent extends Event {
   /**
    * ValidateEvent constructor.
    *
-   * @param $email
+   * @param array $emails
+   *   Email Addresses.
    */
-  public function __construct($emails) {
+  public function __construct(array $emails) {
     $this->emails = $emails;
   }
 
@@ -28,6 +29,7 @@ class ValidateEvent extends Event {
    * Getter for the emails array.
    *
    * @return emails
+   *   Email Addresses.
    */
   public function getEmails() {
     return $this->emails;
@@ -36,9 +38,10 @@ class ValidateEvent extends Event {
   /**
    * Setter for emails array.
    *
-   * @param $emails
+   * @param array $emails
+   *   Email Addresses.
    */
-  public function setEmails($emails) {
+  public function setEmails(array $emails) {
     $this->emails = $emails;
   }
 

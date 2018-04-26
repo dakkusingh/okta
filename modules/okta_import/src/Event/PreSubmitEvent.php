@@ -18,9 +18,10 @@ class PreSubmitEvent extends Event {
   /**
    * PreSubmitEvent constructor.
    *
-   * @param $email
+   * @param array $user
+   *   User.
    */
-  public function __construct($user) {
+  public function __construct(array $user) {
     $this->user = $user;
   }
 
@@ -28,6 +29,7 @@ class PreSubmitEvent extends Event {
    * Getter for the user array.
    *
    * @return user
+   *   User
    */
   public function getUser() {
     return $this->user;
@@ -36,9 +38,10 @@ class PreSubmitEvent extends Event {
   /**
    * Setter for user array.
    *
-   * @param $user
+   * @param array $user
+   *   User.
    */
-  public function setUser($user) {
+  public function setUser(array $user) {
     $this->user = $user;
   }
 
