@@ -5,7 +5,7 @@ namespace Drupal\okta_import\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class PreSubmitEvent
+ * Class PreSubmitEvent.
  *
  * @package Drupal\okta_import\Event
  */

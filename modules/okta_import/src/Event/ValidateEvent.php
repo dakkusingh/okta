@@ -5,7 +5,7 @@ namespace Drupal\okta_import\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class ValidateEvent
+ * Class ValidateEvent.
  *
  * @package Drupal\okta_import\Event
  */
@@ -53,4 +53,5 @@ class ValidateEvent extends Event {
   public function getIndexName() {
     return $this->indexName;
   }
+
 }
