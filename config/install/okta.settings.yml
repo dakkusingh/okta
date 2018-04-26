@@ -1,3 +1,5 @@
 default_question: 'What is your dog called?'
 default_answer: 'I do not have a dog'
 default_password: 'IamNot53curePa55word123'
+default_fname: 'FName'
+default_lname: 'LName'
