@@ -7,9 +7,9 @@ use Drupal\Core\Form\FormBase;
 use Psr\Log\LoggerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-//use Drupal\okta_import\Event\ValidateEvent;
-//use Drupal\okta_import\Event\PreSubmitEvent;
-//use Drupal\okta_import\Event\PostSubmitEvent;
+use Drupal\okta_import\Event\ValidateEvent;
+use Drupal\okta_import\Event\PreSubmitEvent;
+use Drupal\okta_import\Event\PostSubmitEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\okta\Service\User as OktaUser;
 
@@ -139,6 +139,10 @@ class Import extends FormBase {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $password = $form['password']['#value'];
 
+    $emailsList = $form_state->getValue('emails_list');
+    // Remove line breaks and empty.
+    $emails = array_filter(array_map('trim', explode(PHP_EOL, $emailsList)));
+
     // Check if the password meets our criteria.
     // We are not checking if every.
     // Email supplied is in the password.
@@ -152,9 +156,9 @@ class Import extends FormBase {
     // TODO Check if emails are valid?
     // TODO.
     // Allow other modules to subscribe to Validate Event.
-    //    $validateEvent = new ValidateEvent($indexConfig, $indexName);
-    //    $event = $this->eventDispatcher->dispatch(ValidateEvent::OKTA_IMPORT_VALIDATE, $validateEvent);
-    //    $indexConfig = $event->getIndexConfig();
+    $validateEvent = new ValidateEvent($emails);
+    $event = $this->eventDispatcher->dispatch(ValidateEvent::OKTA_IMPORT_VALIDATE, $validateEvent);
+    $emails = $event->getEmails();
   }
 
   /**
@@ -171,14 +175,25 @@ class Import extends FormBase {
 
     foreach ($emails as $email) {
       $user = $this->oktaUser->prepareUser($email, $password, $question, $answer);
-      ksm($user);
-      // TODO.
+//      ksm($user);
+
       // Allow other modules to subscribe to PreSubmit Event.
-      //    $preSubmitEvent = new PreSubmitEvent($email);
-      //    $event = $this->eventDispatcher->dispatch(PreSubmitEvent::OKTA_IMPORT_PRESUBMIT, $preSubmitEvent);
-      //    $email = $event->getEmail();
+      $preSubmitEvent = new PreSubmitEvent($user);
+      $preEvent = $this->eventDispatcher->dispatch(PreSubmitEvent::OKTA_IMPORT_PRESUBMIT, $preSubmitEvent);
+      $user = $preEvent->getUser();
+//      ksm($user);
+
+      // TODO Create Okta Users.
+      // GO GO GO
+
+      // Allow other modules to subscribe to Post Submit Event.
+      $postSubmitEvent = new PostSubmitEvent($user);
+      $postEvent = $this->eventDispatcher->dispatch(PostSubmitEvent::OKTA_IMPORT_POSTSUBMIT, $postSubmitEvent);
+      $user = $postEvent->getUser();
     }
+
     // TODO.
+
   }
 
 }
