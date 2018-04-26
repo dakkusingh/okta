@@ -44,9 +44,9 @@ class User {
 
     $credentials = $this->oktaUserService->buildCredentials(
       $password, [
-      'question' => $this->config->get('default_answer'),
-      'answer' => $this->config->get('default_answer'),
-    ]);
+        'question' => $this->config->get('default_answer'),
+        'answer' => $this->config->get('default_answer'),
+      ]);
 
     $newUser = $this->oktaUserService->userCreate($profile, $credentials, NULL, FALSE);
 
@@ -131,6 +131,76 @@ class User {
     }
 
     return ['valid' => TRUE];
+  }
+
+  /**
+   * Prepare Okta User.
+   *
+   * @param string $email
+   *   Email.
+   * @param string $password
+   *   Pass.
+   * @param string $question
+   *   Default Question.
+   * @param string $answer
+   *   Default Answer.
+   * @param string $firstName
+   *   First Name.
+   * @param string $lastName
+   *   Last Name.
+   *
+   * @return array
+   *   Okta User array.
+   */
+  public function prepareUser($email,
+                              $password = '',
+                              $question = '',
+                              $answer = '',
+                              $firstName = '',
+                              $lastName = '') {
+    // Default FName?
+    if ($firstName == '') {
+      $firstName = $this->config->get('default_fname');
+    }
+
+    // Default LName?
+    if ($lastName == '') {
+      $lastName = $this->config->get('default_lname');
+    }
+
+    // Default Password?
+    if ($password == '') {
+      $password = $this->config->get('default_password');
+    }
+
+    // Default Question?
+    if ($question == '') {
+      $question = $this->config->get('default_question');
+    }
+
+    // Default Answer?
+    if ($answer == '') {
+      $answer = $this->config->get('default_answer');
+    }
+
+    // Create the profile.
+    $profile = $this->oktaUserService->buildProfile($firstName, $lastName, $email, $email);
+
+    // Create the credentials.
+    $credentials = $this->oktaUserService->buildCredentials(
+      $password,
+      [
+        'question' => $question,
+        'answer' => $answer,
+      ]
+    );
+
+    $user = [
+      'profile' => $profile,
+      'credentials' => $credentials,
+    ];
+
+    return $user;
   }
 
 }
