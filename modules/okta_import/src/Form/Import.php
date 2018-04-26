@@ -40,7 +40,7 @@ class Import extends FormBase {
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   The event dispatcher.
    * @param \Drupal\okta\Service\User $oktaUser
-   * Okta User service.
+   *   Okta User service.
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
    *   The config factory.
    */
@@ -96,13 +96,33 @@ class Import extends FormBase {
       '#type' => 'textarea',
       '#title' => $this->t('Emails List'),
       '#default_value' => '',
+      '#description' => $this->t('Email addresses, one on each line.'),
     ];
 
     $form['password'] = [
       '#type' => 'textfield',
+      '#title' => $this->t('Password'),
       '#required' => TRUE,
       '#default_value' => $this->okta_config->get('default_password'),
       '#description' => $this->t('Your password must have<ul><li>8 or more characters</li><li>at least one lowercase letter (a-z)</li><li>at least one uppercase letter (A-Z)</li><li>at least one number (0-9)</li></ul>It must not contain part of your email.'),
+    ];
+
+    // TODO Add slightly more helpful description.
+    $form['question'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Security question'),
+      '#required' => TRUE,
+      '#default_value' => $this->okta_config->get('default_question'),
+      '#description' => $this->t('Default Question. Do not screw this up.'),
+    ];
+
+    // TODO Add slightly more helpful description.
+    $form['answer'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Security password'),
+      '#required' => TRUE,
+      '#default_value' => $this->okta_config->get('default_answer'),
+      '#description' => $this->t('Default Answer. Do not screw this up.'),
     ];
 
     $form['submit'] = [
@@ -129,11 +149,12 @@ class Import extends FormBase {
       return;
     }
 
+    // TODO Check if emails are valid?
     // TODO.
     // Allow other modules to subscribe to Validate Event.
-//    $validateEvent = new ValidateEvent($indexConfig, $indexName);
-//    $event = $this->eventDispatcher->dispatch(ValidateEvent::OKTA_IMPORT_VALIDATE, $validateEvent);
-//    $indexConfig = $event->getIndexConfig();
+    //    $validateEvent = new ValidateEvent($indexConfig, $indexName);
+    //    $event = $this->eventDispatcher->dispatch(ValidateEvent::OKTA_IMPORT_VALIDATE, $validateEvent);
+    //    $indexConfig = $event->getIndexConfig();
   }
 
   /**
@@ -141,10 +162,16 @@ class Import extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $emailsList = $form_state->getValue('emails_list');
+    $password = $form_state->getValue('password');
+    $question = $form_state->getValue('question');
+    $answer = $form_state->getValue('answer');
+
     // Remove line breaks and empty.
     $emails = array_filter(array_map('trim', explode(PHP_EOL, $emailsList)));
 
-    foreach ($emails as $user) {
+    foreach ($emails as $email) {
+      $user = $this->oktaUser->prepareUser($email, $password, $question, $answer);
+      ksm($user);
       // TODO.
       // Allow other modules to subscribe to PreSubmit Event.
       //    $preSubmitEvent = new PreSubmitEvent($email);
@@ -153,4 +180,5 @@ class Import extends FormBase {
     }
     // TODO.
   }
+
 }
