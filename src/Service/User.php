@@ -13,7 +13,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  */
 class User {
 
-  protected $oktaUserService;
+  public $oktaUserService;
   protected $oktaAppService;
   protected $config;
   protected $loggerFactory;
@@ -264,7 +264,7 @@ class User {
    * @return bool|object
    *   False or User.
    */
-  public function registerNewOktaUser(array $user, array $provider = [], $activate = FALSE) {
+  public function registerNewOktaUser(array $user, array $provider = NULL, $activate = FALSE) {
     // Attempt to create the user in OKTA.
     $newUser = $this->oktaUserService->userCreate($user['profile'], $user['credentials'], $provider, $activate);
 

@@ -26,7 +26,8 @@ class PreSubmit implements EventSubscriberInterface {
    */
   public function preSubmitSub(PreSubmitEvent $event) {
     $user = $event->getUser();
-    // $user['profile']['firstName'] = 'foo';
+    // $user['profile']['firstName'] = 'Janak';
+    // $user['profile']['lastName'] = 'Singh';
     // ksm($user);
     $event->setUser($user);
   }
