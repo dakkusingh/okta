@@ -238,7 +238,6 @@ class Import extends FormBase {
       $preEvent = $this->eventDispatcher->dispatch(PreSubmitEvent::OKTA_IMPORT_PRESUBMIT, $preSubmitEvent);
       $user = $preEvent->getUser();
       // ksm($user);
-
       // Create Okta Users.
       // Only create a new OKTA user if
       // The user is not already registered
