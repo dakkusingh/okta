@@ -28,7 +28,7 @@ class PreSubmitEvent extends Event {
   /**
    * Getter for the user array.
    *
-   * @return array user
+   * @return array
    *   User
    */
   public function getUser() {

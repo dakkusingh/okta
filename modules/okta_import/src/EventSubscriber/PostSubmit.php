@@ -25,7 +25,7 @@ class PostSubmit implements EventSubscriberInterface {
    *   Post Submit Event.
    */
   public function postSubmitSub(PostSubmitEvent $event) {
-    $user = $event->getUser();
+    // $user = $event->getUser();
     // ksm($user);
     // $event->setUser($user);
   }

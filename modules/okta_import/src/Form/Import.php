@@ -35,7 +35,7 @@ class Import extends FormBase {
   protected $eventDispatcher;
 
   /**
-   * Okta User Service
+   * Okta User Service.
    *
    * @var \Drupal\okta\Service\User
    */
@@ -206,14 +206,6 @@ class Import extends FormBase {
 
     foreach ($emails as $email) {
       $user = $this->oktaUser->prepareUser($email, $password, $question, $answer);
-      // ksm($user);
-
-      // Already registered in OKTA?
-//      $oktaUserExists = $this->oktaUser->checkOktaAccountExists($email);
-//      if ($oktaUserExists) {
-//        $user['already_registered'] = TRUE;
-//        $user['skip_register'] = TRUE;
-//      }
 
       // Allow other modules to subscribe to Pre Submit Event.
       $preSubmitEvent = new PreSubmitEvent($user);

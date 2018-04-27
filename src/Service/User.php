@@ -61,24 +61,51 @@ class User {
 
   /**
    * Adds an Okta user to an app.
+   *
+   * @param object $user
+   *   User.
+   * @param string $app_id
+   *   App id.
+   * @param bool $assign_app
+   *   Auto assign app?
+   *
+   * @return bool|object
+   *   Obj or False
    */
-  public function addUserToApp($user) {
+  public function addUserToApp($user, $app_id = '', $assign_app = TRUE) {
+    if ($app_id == '') {
+      $this->config->get('default_app_id');
+    }
+
+    if ($app_id == '' || $assign_app == FALSE) {
+      return FALSE;
+    }
+
     $credentials = [
       'id' => $user->id,
       'scope' => 'USER',
       'credentials' => ['userName' => $user->profile->email],
     ];
 
-    $app_id = $this->config->get('default_app_id');
     $addToOktaApp = $this->oktaAppService->assignUsersToApp($app_id, $credentials);
 
     if ($addToOktaApp != FALSE) {
       // Log success.
-      $this->loggerFactory->get('okta')->error("@message", ['@message' => 'Assigned app to user: ' . $user->profile->email]);
+      $this->loggerFactory->get('okta')->error(
+        "@message",
+        [
+          '@message' => 'Assigned app to user: ' . $user->profile->email,
+        ]
+      );
     }
     else {
       // Log fail.
-      $this->loggerFactory->get('okta')->error("@message", ['@message' => 'Failed to assign app to user: ' . $user->profile->email]);
+      $this->loggerFactory->get('okta')->error(
+        "@message",
+        [
+          '@message' => 'Failed to assign app to user: ' . $user->profile->email,
+        ]
+      );
     }
 
     return $addToOktaApp;
@@ -225,18 +252,19 @@ class User {
   }
 
   /**
-   * Register New OKTA User
+   * Register New OKTA User.
    *
    * @param array $user
-   * User to create.
-   * @param null $provider
-   * Provider
+   *   User to create.
+   * @param array $provider
+   *   Provider.
    * @param bool $activate
-   * Activate
+   *   Activate.
    *
    * @return bool|object
+   *   False or User.
    */
-  public function registerNewOktaUser(array $user, $provider = NULL, $activate = FALSE) {
+  public function registerNewOktaUser(array $user, array $provider = [], $activate = FALSE) {
     // Attempt to create the user in OKTA.
     $newUser = $this->oktaUserService->userCreate($user['profile'], $user['credentials'], $provider, $activate);
 
@@ -251,4 +279,5 @@ class User {
 
     return $newUser;
   }
+
 }
