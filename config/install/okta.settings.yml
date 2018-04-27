@@ -1,5 +1,7 @@
 default_question: 'What is your dog called?'
-default_answer: 'I do not have a dog'
+default_answer: 'Marry had a little lamb and the lamb died.'
 default_password: 'IamNot53curePa55word123'
 default_fname: 'FName'
 default_lname: 'LName'
+default_app_id: 'default_app_id'
+assign_app: TRUE
