@@ -1,4 +1,6 @@
 # Okta Integration
+[![CircleCI](https://circleci.com/gh/dakkusingh/okta.svg?style=svg)](https://circleci.com/gh/dakkusingh/okta)
+
 The Okta Integration Module provides Okta functionality as 
 Drupal addon module to manage the Okta instance.
 
