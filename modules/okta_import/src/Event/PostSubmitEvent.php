@@ -18,10 +18,10 @@ class PostSubmitEvent extends Event {
   /**
    * PostSubmitEvent constructor.
    *
-   * @param array $user
+   * @param object $user
    *   User.
    */
-  public function __construct(array $user) {
+  public function __construct($user) {
     $this->user = $user;
   }
 
@@ -38,10 +38,10 @@ class PostSubmitEvent extends Event {
   /**
    * Setter for user array.
    *
-   * @param array $user
+   * @param object $user
    *   User.
    */
-  public function setUser(array $user) {
+  public function setUser($user) {
     $this->user = $user;
   }
 

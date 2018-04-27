@@ -26,7 +26,7 @@ class Validate implements EventSubscriberInterface {
    */
   public function validateSub(ValidateEvent $event) {
     $emails = $event->getEmails();
-    ksm($emails);
+    // ksm($emails);
   }
 
 }
