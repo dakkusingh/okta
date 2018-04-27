@@ -134,6 +134,26 @@ class Import extends FormBase {
       '#description' => $this->t('Default Answer. Do not screw this up.'),
     ];
 
+    $form['app'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Application Assignment'),
+    ];
+
+    $form['app']['assign_app'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Automatically assign user to Apps?'),
+      '#description' => $this->t('If checked, the user will be auto assigned to application.'),
+      '#default_value' => $this->okta_config->get('assign_app'),
+    ];
+
+    $form['app']['app_id'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Application ID'),
+      '#required' => TRUE,
+      '#default_value' => $this->okta_config->get('default_app_id'),
+      '#description' => $this->t('ID of the application to which the user should be assigned.'),
+    ];
+
     $form['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Import'),
@@ -178,6 +198,8 @@ class Import extends FormBase {
     $password = $form_state->getValue('password');
     $question = $form_state->getValue('question');
     $answer = $form_state->getValue('answer');
+    $assignApp = $form_state->getValue('assign_app');
+    $appID = $form_state->getValue('app_id');
 
     // Remove line breaks and empty.
     $emails = array_filter(array_map('trim', explode(PHP_EOL, $emailsList)));
@@ -211,8 +233,8 @@ class Import extends FormBase {
 
       if ($newUser != FALSE) {
         // Attempt to Add user to OKTA App.
-//        $addToOktaApp = $this->oktaUser->addUserToApp($newUser);
-//        kint($addToOktaApp);
+        $addToOktaApp = $this->oktaUser->addUserToApp($newUser, $appID, $assignApp);
+        ksm($addToOktaApp);
 
         // Allow other modules to subscribe to Post Submit Event.
         $postSubmitEvent = new PostSubmitEvent($newUser);
