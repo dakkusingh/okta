@@ -108,7 +108,12 @@ class Import extends FormBase {
       '#description' => $this->t('Email addresses, one on each line.'),
     ];
 
-    $form['password'] = [
+    $form['creds'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Credentials'),
+    ];
+
+    $form['creds']['password'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Password'),
       '#required' => TRUE,
@@ -117,7 +122,7 @@ class Import extends FormBase {
     ];
 
     // TODO Add slightly more helpful description.
-    $form['question'] = [
+    $form['creds']['question'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Security question'),
       '#required' => TRUE,
@@ -126,12 +131,31 @@ class Import extends FormBase {
     ];
 
     // TODO Add slightly more helpful description.
-    $form['answer'] = [
+    $form['creds']['answer'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Security answer'),
       '#required' => TRUE,
       '#default_value' => $this->okta_config->get('default_answer'),
       '#description' => $this->t('Default Answer. Do not screw this up.'),
+    ];
+
+    $form['activate'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Activation'),
+    ];
+
+    $form['activate']['auto_activate'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Automatically activate user'),
+      '#description' => $this->t('If checked, the user will be activated automatically.'),
+      '#default_value' => $this->okta_config->get('auto_activate'),
+    ];
+
+    $form['activate']['activation_notify'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Notify user of account activation'),
+      '#description' => $this->t('If checked, the user will be sent email notification by OKTA.'),
+      '#default_value' => $this->okta_config->get('activation_notify'),
     ];
 
     $form['app'] = [
@@ -166,7 +190,7 @@ class Import extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $password = $form['password']['#value'];
+    $password = $form['creds']['password']['#value'];
 
     $emailsList = $form_state->getValue('emails_list');
     // Remove line breaks and empty.
@@ -178,7 +202,7 @@ class Import extends FormBase {
     $passwordIsValid = $this->oktaUser->checkPasswordIsValid($password, '');
 
     if ($passwordIsValid['valid'] == FALSE) {
-      $form_state->setError($form['password'], $passwordIsValid['message']);
+      $form_state->setError($form['creds']['password'], $passwordIsValid['message']);
       return;
     }
 
@@ -200,6 +224,8 @@ class Import extends FormBase {
     $answer = $form_state->getValue('answer');
     $assignApp = $form_state->getValue('assign_app');
     $appID = $form_state->getValue('app_id');
+    $auto_activate = $form_state->getValue('auto_activate');
+    $activation_notify = $form_state->getValue('activation_notify');
 
     // Remove line breaks and empty.
     $emails = array_filter(array_map('trim', explode(PHP_EOL, $emailsList)));
@@ -211,7 +237,7 @@ class Import extends FormBase {
       $preSubmitEvent = new PreSubmitEvent($user);
       $preEvent = $this->eventDispatcher->dispatch(PreSubmitEvent::OKTA_IMPORT_PRESUBMIT, $preSubmitEvent);
       $user = $preEvent->getUser();
-      ksm($user);
+      // ksm($user);
 
       // Create Okta Users.
       // Only create a new OKTA user if
@@ -220,18 +246,21 @@ class Import extends FormBase {
       if ($user['skip_register'] == FALSE || $user['already_registered'] == FALSE) {
         // Attempt to create the user in OKTA.
         $newUser = $this->oktaUser->registerNewOktaUser($user, NULL, FALSE);
-        ksm($newUser);
-      }
 
-      if ($newUser != FALSE) {
-        // Attempt to Add user to OKTA App.
-        $addToOktaApp = $this->oktaUser->addUserToApp($newUser, $appID, $assignApp);
-        ksm($addToOktaApp);
+        if ($newUser != FALSE) {
+          // Activate user.
+          if ($auto_activate == TRUE) {
+            $activatedUser = $this->oktaUser->oktaUserService->userActivate($newUser->id, $activation_notify);
+          }
 
-        // Allow other modules to subscribe to Post Submit Event.
-        $postSubmitEvent = new PostSubmitEvent($newUser);
-        $postEvent = $this->eventDispatcher->dispatch(PostSubmitEvent::OKTA_IMPORT_POSTSUBMIT, $postSubmitEvent);
-        $user = $postEvent->getUser();
+          // Add user to OKTA App.
+          $addToOktaApp = $this->oktaUser->addUserToApp($newUser, $appID, $assignApp);
+
+          // Allow other modules to subscribe to Post Submit Event.
+          $postSubmitEvent = new PostSubmitEvent($newUser);
+          $postEvent = $this->eventDispatcher->dispatch(PostSubmitEvent::OKTA_IMPORT_POSTSUBMIT, $postSubmitEvent);
+          // $user = $postEvent->getUser();
+        }
       }
 
     }
