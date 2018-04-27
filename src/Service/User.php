@@ -2,6 +2,7 @@
 
 namespace Drupal\okta\Service;
 
+use Drupal\Core\Logger\LoggerChannelFactory;
 use Drupal\okta_api\Service\Users;
 use Drupal\okta_api\Service\Apps;
 use Drupal\Core\Config\ConfigFactory;
@@ -15,6 +16,7 @@ class User {
   protected $oktaUserService;
   protected $oktaAppService;
   protected $config;
+  protected $loggerFactory;
 
   use StringTranslationTrait;
 
@@ -27,13 +29,17 @@ class User {
    *   An instance of okta_api Apps service.
    * @param \Drupal\Core\Config\ConfigFactory $config
    *   An instance of Config Factory.
+   * @param \Drupal\Core\Logger\LoggerChannelFactory $loggerFactory
+   *   LoggerChannelFactory.
    */
   public function __construct(Users $oktaUserService,
                               Apps $oktaAppService,
-                              ConfigFactory $config) {
+                              ConfigFactory $config,
+                              LoggerChannelFactory $loggerFactory) {
     $this->oktaUserService = $oktaUserService;
     $this->oktaAppService = $oktaAppService;
     $this->config = $config->getEditable('okta.settings');
+    $this->loggerFactory = $loggerFactory;
   }
 
   /**
@@ -64,21 +70,18 @@ class User {
     ];
 
     $app_id = $this->config->get('default_app_id');
-    return $this->oktaAppService->assignUsersToApp($app_id, $credentials);
-  }
+    $addToOktaApp = $this->oktaAppService->assignUsersToApp($app_id, $credentials);
 
-  /**
-   * Gets an Okta user by email address.
-   *
-   * @param string $email
-   *   Email address.
-   *
-   * @return null|object
-   *   Returns the Okta account if it exists.
-   */
-  public function getUserByEmail($email) {
-    $user = $this->oktaUserService->userGetByEmail($email);
-    return $user;
+    if ($addToOktaApp != FALSE) {
+      // Log success.
+      $this->loggerFactory->get('okta')->error("@message", ['@message' => 'Assigned app to user: ' . $user->profile->email]);
+    }
+    else {
+      // Log fail.
+      $this->loggerFactory->get('okta')->error("@message", ['@message' => 'Failed to assign app to user: ' . $user->profile->email]);
+    }
+
+    return $addToOktaApp;
   }
 
   /**
@@ -200,9 +203,52 @@ class User {
     $user = [
       'profile' => $profile,
       'credentials' => $credentials,
+      'already_registered' => FALSE,
+      'skip_register' => FALSE,
     ];
 
     return $user;
   }
 
+  /**
+   * Checks whether a user already has an Okta account.
+   *
+   * @param string $email
+   *   Email address.
+   *
+   * @return bool
+   *   Returns TRUE if the user has an Okta account.
+   */
+  public function checkOktaAccountExists($email) {
+    $user = $this->oktaUserService->userGetByEmail($email);
+    return isset($user);
+  }
+
+  /**
+   * Register New OKTA User
+   *
+   * @param array $user
+   * User to create.
+   * @param null $provider
+   * Provider
+   * @param bool $activate
+   * Activate
+   *
+   * @return bool|object
+   */
+  public function registerNewOktaUser(array $user, $provider = NULL, $activate = FALSE) {
+    // Attempt to create the user in OKTA.
+    $newUser = $this->oktaUserService->userCreate($user['profile'], $user['credentials'], $provider, $activate);
+
+    if ($newUser != FALSE) {
+      // Log user create success.
+      $this->loggerFactory->get('okta')->error("@message", ['@message' => 'created user: ' . $user['profile']['email']]);
+    }
+    else {
+      // Log user create fail.
+      $this->loggerFactory->get('okta')->error("@message", ['@message' => 'failed to create user: ' . $user['profile']['email']]);
+    }
+
+    return $newUser;
+  }
 }
