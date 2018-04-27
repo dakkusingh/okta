@@ -35,6 +35,13 @@ class Import extends FormBase {
   protected $eventDispatcher;
 
   /**
+   * Okta User Service
+   *
+   * @var \Drupal\okta\Service\User
+   */
+  protected $oktaUser;
+
+  /**
    * Import constructor.
    *
    * @param \Psr\Log\LoggerInterface $logger
@@ -121,7 +128,7 @@ class Import extends FormBase {
     // TODO Add slightly more helpful description.
     $form['answer'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Security password'),
+      '#title' => $this->t('Security answer'),
       '#required' => TRUE,
       '#default_value' => $this->okta_config->get('default_answer'),
       '#description' => $this->t('Default Answer. Do not screw this up.'),
@@ -178,17 +185,41 @@ class Import extends FormBase {
     foreach ($emails as $email) {
       $user = $this->oktaUser->prepareUser($email, $password, $question, $answer);
       // ksm($user);
-      // Allow other modules to subscribe to PreSubmit Event.
+
+      // Already registered in OKTA?
+//      $oktaUserExists = $this->oktaUser->checkOktaAccountExists($email);
+//      if ($oktaUserExists) {
+//        $user['already_registered'] = TRUE;
+//        $user['skip_register'] = TRUE;
+//      }
+
+      // Allow other modules to subscribe to Pre Submit Event.
       $preSubmitEvent = new PreSubmitEvent($user);
       $preEvent = $this->eventDispatcher->dispatch(PreSubmitEvent::OKTA_IMPORT_PRESUBMIT, $preSubmitEvent);
       $user = $preEvent->getUser();
-      // ksm($user);
-      // TODO Create Okta Users.
-      // GO GO GO.
-      // Allow other modules to subscribe to Post Submit Event.
-      $postSubmitEvent = new PostSubmitEvent($user);
-      $postEvent = $this->eventDispatcher->dispatch(PostSubmitEvent::OKTA_IMPORT_POSTSUBMIT, $postSubmitEvent);
-      $user = $postEvent->getUser();
+      ksm($user);
+
+      // Create Okta Users.
+      // Only create a new OKTA user if
+      // The user is not already registered
+      // or skip is false, skip could be false due to number of reasons.
+      if ($user['skip_register'] == FALSE || $user['already_registered'] == FALSE) {
+        // Attempt to create the user in OKTA.
+        $newUser = $this->oktaUser->registerNewOktaUser($user, NULL, FALSE);
+        ksm($newUser);
+      }
+
+      if ($newUser != FALSE) {
+        // Attempt to Add user to OKTA App.
+//        $addToOktaApp = $this->oktaUser->addUserToApp($newUser);
+//        kint($addToOktaApp);
+
+        // Allow other modules to subscribe to Post Submit Event.
+        $postSubmitEvent = new PostSubmitEvent($newUser);
+        $postEvent = $this->eventDispatcher->dispatch(PostSubmitEvent::OKTA_IMPORT_POSTSUBMIT, $postSubmitEvent);
+        $user = $postEvent->getUser();
+      }
+
     }
 
     // TODO.
