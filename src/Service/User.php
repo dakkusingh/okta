@@ -260,22 +260,24 @@ class User {
    *   Provider.
    * @param bool $activate
    *   Activate.
+   * @param bool $returnExisting
+   * Return Existing?
    *
    * @return bool|object
    *   False or User.
    */
-  public function registerNewOktaUser(array $user, array $provider = NULL, $activate = FALSE) {
-    // Attempt to create the user in OKTA.
-    $newUser = $this->oktaUserService->userCreate($user['profile'], $user['credentials'], $provider, $activate);
+  public function registerNewOktaUser(array $user,
+                                      array $provider = NULL,
+                                      $activate = FALSE,
+                                      $returnExisting = TRUE) {
 
-    if ($newUser != FALSE) {
-      // Log user create success.
-      $this->loggerFactory->get('okta')->error("@message", ['@message' => 'created user: ' . $user['profile']['email']]);
-    }
-    else {
-      // Log user create fail.
-      $this->loggerFactory->get('okta')->error("@message", ['@message' => 'failed to create user: ' . $user['profile']['email']]);
-    }
+    // Attempt to create the user in OKTA.
+    $newUser = $this->oktaUserService->userCreate(
+      $user['profile'],
+      $user['credentials'],
+      $provider,
+      $activate,
+      $returnExisting);
 
     return $newUser;
   }
