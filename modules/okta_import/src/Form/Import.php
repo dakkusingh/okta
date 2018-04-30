@@ -237,34 +237,46 @@ class Import extends FormBase {
       $preSubmitEvent = new PreSubmitEvent($user);
       $preEvent = $this->eventDispatcher->dispatch(PreSubmitEvent::OKTA_IMPORT_PRESUBMIT, $preSubmitEvent);
       $user = $preEvent->getUser();
-      // ksm($user);
+
       // Create Okta Users.
       // Only create a new OKTA user if
       // The user is not already registered
       // or skip is false, skip could be false due to number of reasons.
       if ($user['skip_register'] == FALSE || $user['already_registered'] == FALSE) {
         // Attempt to create the user in OKTA.
-        $newUser = $this->oktaUser->registerNewOktaUser($user, NULL, FALSE);
+        $newUser = $this->oktaUser->registerNewOktaUser($user, NULL, FALSE, FALSE);
 
         if ($newUser != FALSE) {
           // Activate user.
-          if ($auto_activate == TRUE) {
-            $activatedUser = $this->oktaUser->oktaUserService->userActivate($newUser->id, $activation_notify);
+          // Only if not already active.
+          if ($auto_activate == TRUE && $newUser != 'ACTIVE') {
+            $this->oktaUser->oktaUserService->userActivate($newUser->id, $activation_notify);
           }
 
           // Add user to OKTA App.
-          $addToOktaApp = $this->oktaUser->addUserToApp($newUser, $appID, $assignApp);
+          // TODO Only assign if not already assigned.
+          if ($assignApp == TRUE) {
+            $this->oktaUser->addUserToApp($newUser, $appID, $assignApp);
+          }
+
+          // Set the success message.
+          drupal_set_message($this->t('Finished importing user to Okta: '. $email));
 
           // Allow other modules to subscribe to Post Submit Event.
           $postSubmitEvent = new PostSubmitEvent($newUser);
-          $postEvent = $this->eventDispatcher->dispatch(PostSubmitEvent::OKTA_IMPORT_POSTSUBMIT, $postSubmitEvent);
-          // $user = $postEvent->getUser();
+          $this->eventDispatcher->dispatch(PostSubmitEvent::OKTA_IMPORT_POSTSUBMIT, $postSubmitEvent);
         }
+        else {
+          // Set the fail message.
+          drupal_set_message($this->t('Failed to import user to Okta: '. $email), 'warning');
+        }
+
       }
-
+      else {
+        // Set the skip message.
+        drupal_set_message($this->t('Skipped to import user to Okta: '. $email), 'warning');
+      }
     }
-
-    // TODO.
   }
 
 }
