@@ -111,59 +111,6 @@ class User {
     return $addToOktaApp;
   }
 
-  /**
-   * Checks that the user's password is valid.
-   *
-   * @param string $password
-   *   Password.
-   * @param string $email
-   *   Email.
-   *
-   * @return array
-   *   Returns TRUE if the password is valid, FALSE if not.
-   */
-  public function checkPasswordIsValid($password, $email) {
-    // OKTA Default password policy requires
-    // passwords to meet a certain criteria.
-    // See: https://developer.okta.com/docs/api/resources/policy.html#PasswordComplexityObject
-    // This custom implementation should be replaced by password_policy
-    // module once the issue below is resolved
-    // https://www.drupal.org/project/password_policy/issues/2924009
-    // https://www.drupal.org/project/password_policy/issues/2562481
-    // See:
-    // http://cgit.drupalcode.org/password_policy/tree/password_policy_length/src/Plugin/PasswordConstraint/PasswordLength.php?h=8.x-3.x
-    if (strlen($password) < 8) {
-      return [
-        'valid' => FALSE,
-        'message' => $this->t('Password length must be at least 8 characters.'),
-      ];
-    }
-
-    // See:
-    // http://cgit.drupalcode.org/password_policy/tree/password_policy_character_types/src/Plugin/PasswordConstraint/CharacterTypes.php?h=8.x-3.x
-    $character_sets = count(array_filter([
-      preg_match('/[a-z]/', $password),
-      preg_match('/[A-Z]/', $password),
-      preg_match('/[0-9]/', $password),
-    ]));
-    if ($character_sets < 3) {
-      return [
-        'valid' => FALSE,
-        'message' => $this->t('Password must contain at least 1 types of character of: lowercase letters, uppercase letters, digits.'),
-      ];
-    }
-
-    // See:
-    // http://cgit.drupalcode.org/password_policy/tree/password_policy_username/src/Plugin/PasswordConstraint/PasswordUsername.php?h=8.x-3.x
-    if (stripos($password, $email) !== FALSE) {
-      return [
-        'valid' => FALSE,
-        'message' => $this->t('Password must not contain the email address.'),
-      ];
-    }
-
-    return ['valid' => TRUE];
-  }
 
   /**
    * Prepare Okta User.
@@ -237,18 +184,5 @@ class User {
     return $user;
   }
 
-  /**
-   * Checks whether a user already has an Okta account.
-   *
-   * @param string $email
-   *   Email address.
-   *
-   * @return bool
-   *   Returns TRUE if the user has an Okta account.
-   */
-  public function checkOktaAccountExists($email) {
-    $user = $this->oktaUserService->userGetByEmail($email);
-    return isset($user);
-  }
 
 }

@@ -204,7 +204,7 @@ class Import extends FormBase {
     // Check if the password meets our criteria.
     // We are not checking if every.
     // Email supplied is in the password.
-    $passwordIsValid = $this->oktaUser->checkPasswordIsValid($password, '');
+    $passwordIsValid = $this->oktaApiUsers->checkPasswordIsValid($password, '');
 
     if ($passwordIsValid['valid'] == FALSE) {
       $form_state->setError($form['creds']['password'], $passwordIsValid['message']);
