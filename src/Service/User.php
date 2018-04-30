@@ -111,7 +111,6 @@ class User {
     return $addToOktaApp;
   }
 
-
   /**
    * Prepare Okta User.
    *
@@ -183,6 +182,5 @@ class User {
 
     return $user;
   }
-
 
 }

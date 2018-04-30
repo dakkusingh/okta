@@ -52,6 +52,7 @@ class Import extends FormBase {
    * @param \Drupal\okta\Service\User $oktaUser
    *   Okta User service.
    * @param \Drupal\okta_api\Service\Users $oktaApiUsers
+   *   Okta API Users Service.
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
    *   The config factory.
    */
@@ -270,7 +271,7 @@ class Import extends FormBase {
           }
 
           // Set the success message.
-          drupal_set_message($this->t('Finished importing user to Okta: '. $email));
+          drupal_set_message($this->t('Finished importing user to Okta: @email', ['@email' => $email]));
 
           // Allow other modules to subscribe to Post Submit Event.
           $postSubmitEvent = new PostSubmitEvent($newUser);
@@ -278,13 +279,13 @@ class Import extends FormBase {
         }
         else {
           // Set the fail message.
-          drupal_set_message($this->t('Failed to import user to Okta: '. $email), 'warning');
+          drupal_set_message($this->t('Failed to import user to Okta: @email', ['@email' => $email]), 'warning');
         }
 
       }
       else {
         // Set the skip message.
-        drupal_set_message($this->t('Skipped to import user to Okta: '. $email), 'warning');
+        drupal_set_message($this->t('Skipped to import user to Okta: @email', ['@email' => $email]), 'warning');
       }
     }
   }
