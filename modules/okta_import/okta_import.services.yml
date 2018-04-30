@@ -1,13 +1,13 @@
 services:
-  okta_import.presubmit:
-    class: Drupal\okta_import\EventSubscriber\PreSubmit
+  okta_import.preuserimportsubscriber:
+    class: Drupal\okta_import\EventSubscriber\PreUserImportSubscriber
     tags:
       - { name: event_subscriber }
-  okta_import.postsubmit:
-    class: Drupal\okta_import\EventSubscriber\PostSubmit
+  okta_import.postuserimportsubscriber:
+    class: Drupal\okta_import\EventSubscriber\PostUserImportSubscriber
     tags:
       - { name: event_subscriber }
-  okta_import.validate:
-    class: Drupal\okta_import\EventSubscriber\Validate
+  okta_import.validateuserimport:
+    class: Drupal\okta_import\EventSubscriber\ValidateUserImportSubscriber
     tags:
       - { name: event_subscriber }

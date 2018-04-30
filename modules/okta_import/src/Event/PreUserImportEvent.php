@@ -5,18 +5,18 @@ namespace Drupal\okta_import\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class PreSubmitEvent.
+ * Class PreUserImportEvent.
  *
  * @package Drupal\okta_import\Event
  */
-class PreSubmitEvent extends Event {
+class PreUserImportEvent extends Event {
 
-  const OKTA_IMPORT_PRESUBMIT = 'okta_import.presubmit';
+  const OKTA_IMPORT_PREUSERIMPORT = 'okta_import.preuserimport';
 
   protected $user;
 
   /**
-   * PreSubmitEvent constructor.
+   * PreUserImportEvent constructor.
    *
    * @param array $user
    *   User.

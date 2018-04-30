@@ -8,9 +8,9 @@ use Drupal\okta_api\Service\Users as OktaApiUsers;
 use Psr\Log\LoggerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\okta_import\Event\ValidateEvent;
-use Drupal\okta_import\Event\PreSubmitEvent;
-use Drupal\okta_import\Event\PostSubmitEvent;
+use Drupal\okta_import\Event\ValidateUserImportEvent;
+use Drupal\okta_import\Event\PreUserImportEvent;
+use Drupal\okta_import\Event\PostUserImportEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\okta\Service\User as OktaUser;
 
@@ -215,8 +215,8 @@ class Import extends FormBase {
     // TODO Check if emails are valid?
     // TODO.
     // Allow other modules to subscribe to Validate Event.
-    $validateEvent = new ValidateEvent($emails);
-    $event = $this->eventDispatcher->dispatch(ValidateEvent::OKTA_IMPORT_VALIDATE, $validateEvent);
+    $validateEvent = new ValidateUserImportEvent($emails);
+    $event = $this->eventDispatcher->dispatch(ValidateUserImportEvent::OKTA_IMPORT_VALIDATEUSERIMPORT, $validateEvent);
     $emails = $event->getEmails();
   }
 
@@ -240,8 +240,8 @@ class Import extends FormBase {
       $user = $this->oktaUser->prepareUser($email, $password, $question, $answer);
 
       // Allow other modules to subscribe to Pre Submit Event.
-      $preSubmitEvent = new PreSubmitEvent($user);
-      $preEvent = $this->eventDispatcher->dispatch(PreSubmitEvent::OKTA_IMPORT_PRESUBMIT, $preSubmitEvent);
+      $preUserImportEvent = new PreUserImportEvent($user);
+      $preEvent = $this->eventDispatcher->dispatch(PreUserImportEvent::OKTA_IMPORT_PREUSERIMPORT, $preUserImportEvent);
       $user = $preEvent->getUser();
 
       // Create Okta Users.
@@ -274,8 +274,8 @@ class Import extends FormBase {
           drupal_set_message($this->t('Finished importing user to Okta: @email', ['@email' => $email]));
 
           // Allow other modules to subscribe to Post Submit Event.
-          $postSubmitEvent = new PostSubmitEvent($newUser);
-          $this->eventDispatcher->dispatch(PostSubmitEvent::OKTA_IMPORT_POSTSUBMIT, $postSubmitEvent);
+          $postUserImportEvent = new PostUserImportEvent($newUser);
+          $this->eventDispatcher->dispatch(PostUserImportEvent::OKTA_IMPORT_POSTUSERIMPORT, $postUserImportEvent);
         }
         else {
           // Set the fail message.

@@ -5,18 +5,18 @@ namespace Drupal\okta_import\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class ValidateEvent.
+ * Class ValidateUserImportEvent.
  *
  * @package Drupal\okta_import\Event
  */
-class ValidateEvent extends Event {
+class ValidateUserImportEvent extends Event {
 
-  const OKTA_IMPORT_VALIDATE = 'okta_import.validate';
+  const OKTA_IMPORT_VALIDATEUSERIMPORT = 'okta_import.validateuserimport';
 
   protected $emails;
 
   /**
-   * ValidateEvent constructor.
+   * ValidateUserImportEvent constructor.
    *
    * @param array $emails
    *   Email Addresses.

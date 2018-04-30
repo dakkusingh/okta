@@ -5,18 +5,18 @@ namespace Drupal\okta_import\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class PostSubmitEvent.
+ * Class PostUserImportEvent.
  *
  * @package Drupal\okta_import\Event
  */
-class PostSubmitEvent extends Event {
+class PostUserImportEvent extends Event {
 
-  const OKTA_IMPORT_POSTSUBMIT = 'okta_import.postsubmit';
+  const OKTA_IMPORT_POSTUSERIMPORT = 'okta_import.postuserimport';
 
   protected $user;
 
   /**
-   * PostSubmitEvent constructor.
+   * PostUserImportEvent constructor.
    *
    * @param object $user
    *   User.

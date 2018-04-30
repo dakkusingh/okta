@@ -2,29 +2,29 @@
 
 namespace Drupal\okta_import\EventSubscriber;
 
-use Drupal\okta_import\Event\PreSubmitEvent;
+use Drupal\okta_import\Event\PreUserImportEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * {@inheritdoc}
  */
-class PreSubmit implements EventSubscriberInterface {
+class PreUserImportSubscriber implements EventSubscriberInterface {
 
   /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events[PreSubmitEvent::OKTA_IMPORT_PRESUBMIT] = 'preSubmitSub';
+    $events[PreUserImportEvent::OKTA_IMPORT_PREUSERIMPORT] = 'doPreUserImport';
     return $events;
   }
 
   /**
    * Alter user before pre submit.
    *
-   * @param \Drupal\okta_import\Event\PreSubmitEvent $event
+   * @param \Drupal\okta_import\Event\PreUserImportEvent $event
    *   Pre Submit Event.
    */
-  public function preSubmitSub(PreSubmitEvent $event) {
+  public function doPreUserImport(PreUserImportEvent $event) {
     $user = $event->getUser();
     // $user['profile']['firstName'] = 'Janak';
     // $user['profile']['lastName'] = 'Singh';
