@@ -251,35 +251,4 @@ class User {
     return isset($user);
   }
 
-  /**
-   * Register New OKTA User.
-   *
-   * @param array $user
-   *   User to create.
-   * @param array $provider
-   *   Provider.
-   * @param bool $activate
-   *   Activate.
-   * @param bool $returnExisting
-   * Return Existing?
-   *
-   * @return bool|object
-   *   False or User.
-   */
-  public function registerNewOktaUser(array $user,
-                                      array $provider = NULL,
-                                      $activate = FALSE,
-                                      $returnExisting = TRUE) {
-
-    // Attempt to create the user in OKTA.
-    $newUser = $this->oktaUserService->userCreate(
-      $user['profile'],
-      $user['credentials'],
-      $provider,
-      $activate,
-      $returnExisting);
-
-    return $newUser;
-  }
-
 }

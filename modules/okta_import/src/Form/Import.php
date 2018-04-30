@@ -4,6 +4,7 @@ namespace Drupal\okta_import\Form;
 
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Form\FormBase;
+use Drupal\okta_api\Service\Users as OktaApiUsers;
 use Psr\Log\LoggerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -50,16 +51,19 @@ class Import extends FormBase {
    *   The event dispatcher.
    * @param \Drupal\okta\Service\User $oktaUser
    *   Okta User service.
+   * @param \Drupal\okta_api\Service\Users $oktaApiUsers
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
    *   The config factory.
    */
   public function __construct(LoggerInterface $logger,
                               EventDispatcherInterface $eventDispatcher,
                               OktaUser $oktaUser,
+                              OktaApiUsers $oktaApiUsers,
                               ConfigFactory $config_factory) {
     $this->logger = $logger;
     $this->eventDispatcher = $eventDispatcher;
     $this->oktaUser = $oktaUser;
+    $this->oktaApiUsers = $oktaApiUsers;
     $this->okta_config = $config_factory->get('okta.settings');
     $this->okta_import_config = $config_factory->get('okta_import.import');
   }
@@ -72,6 +76,7 @@ class Import extends FormBase {
       $container->get('logger.factory')->get('okta_import'),
       $container->get('event_dispatcher'),
       $container->get('okta.user'),
+      $container->get('okta_api.users'),
       $container->get('config.factory')
     );
   }
@@ -244,7 +249,12 @@ class Import extends FormBase {
       // or skip is false, skip could be false due to number of reasons.
       if ($user['skip_register'] == FALSE || $user['already_registered'] == FALSE) {
         // Attempt to create the user in OKTA.
-        $newUser = $this->oktaUser->registerNewOktaUser($user, NULL, FALSE, FALSE);
+        $newUser = $this->oktaApiUsers->userCreate(
+          $user['profile'],
+          $user['credentials'],
+          NULL,
+          FALSE,
+          FALSE);
 
         if ($newUser != FALSE) {
           // Activate user.
