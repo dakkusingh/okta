@@ -248,7 +248,7 @@ class Import extends FormBase {
       // Only create a new OKTA user if
       // The user is not already registered
       // or skip is false, skip could be false due to number of reasons.
-      if ($user['skip_register'] == FALSE || $user['already_registered'] == FALSE) {
+      if ($user['skip_register'] == FALSE) {
         // Attempt to create the user in OKTA.
         $newUser = $this->oktaApiUsers->userCreate(
           $user['profile'],

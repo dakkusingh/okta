@@ -176,7 +176,6 @@ class User {
     $user = [
       'profile' => $profile,
       'credentials' => $credentials,
-      'already_registered' => FALSE,
       'skip_register' => FALSE,
     ];
 
